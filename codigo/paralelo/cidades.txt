@@ -1,0 +1,12 @@
+Sao_Paulo,834,766
+Rio_de_Janeiro,915,790
+Belo_Horizonte,851,684
+Salvador,980,451
+Fortaleza,995,217
+Brasilia,758,529
+Curitiba,790,854
+Manaus,389,211
+Recife,1030,396
+Porto_Alegre,737,978
+
+
