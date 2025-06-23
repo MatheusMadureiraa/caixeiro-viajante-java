@@ -25,10 +25,10 @@ Navegue até o diretório da solução sequencial e execute o seguinte comando:
 cd ./codigo/sequencial
 
 # Compile o arquivo .java
-javac [NomeDaClassePrincipalSequencial].java
+javac *.java
 
 # Execute o programa
-java [NomeDaClassePrincipalSequencial]
+java ResolvedorPCV.java
 ```
 
 ### 2. Solução Paralela
@@ -39,10 +39,10 @@ Navegue até o diretório da solução paralela para compilar e executar:
 cd ./codigo/paralelo
 
 # Compile o arquivo .java
-javac [NomeDaClassePrincipalParalela].java
+javac *.java
 
 # Execute o programa
-java [NomeDaClassePrincipalParalela]
+java ResolvedorParalelo.java
 ```
 
 ### 3. Solução Distribuída (RMI)
@@ -70,7 +70,7 @@ cd ./codigo/distribuido/
 javac *.java
 
 # Inicie o Worker (repita em máquinas/terminais diferentes para mais workers)
-java [NomeDaClasseWorker]
+java TSPWorker.java
 ```
 
 **Passo C: Iniciar o Servidor (Master)**
@@ -81,7 +81,7 @@ Finalmente, em um novo terminal, inicie o servidor que irá gerenciar e distribu
 cd ./codigo/distribuido/
 
 # Execute o servidor para iniciar o processamento
-java [NomeDaClasseServer]
+java TSPServer.java
 ```
 
 ## Acesso Rápido
@@ -92,8 +92,10 @@ java [NomeDaClasseServer]
 * ➡️ **[Apresentação de Slides](./apresentacao/)**
 
 ## Integrantes do Grupo
-1. [Nome do Integrante 1]
-2. [Nome do Integrante 2]
-3. [Nome do Integrante 3]
-4. ...
-5. ...
+1. Carlos Hereman
+2. Kauan Pedreira
+3. Matheus Madureira
+4. Luccas Maia
+5. Thales Granja
+6. Jeferson Rocha
+7. Matheus Andrade
