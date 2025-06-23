@@ -30,6 +30,7 @@ public class ResolvedorParalelo {
         long tempoVMP = System.nanoTime() - inicioVMP;
         
         System.out.printf("Execucao VMP concluida em %.4fs\n", tempoVMP / 1e9);
+        System.out.printf("Em ms: %.3fms\n", tempoVMP / 1e6);
         System.out.println("Rota VMP: " + resVMP.getRota().stream().map(CidadePCV::getNome).collect(Collectors.joining(", ")));
         System.out.printf("Distancia VMP: %.2f\n", resVMP.getDistancia());
         
@@ -41,6 +42,7 @@ public class ResolvedorParalelo {
         
         if (resFB.getRota() != null) {
             System.out.printf("Execucao Forca Bruta concluida em %.4fs\n", tempoFB / 1e9);
+            System.out.printf("Em ms: %.3fms\n", tempoFB / 1e6);
             System.out.println("Rota Forca Bruta: " + resFB.getRota().stream().map(CidadePCV::getNome).collect(Collectors.joining(", ")));
             System.out.printf("Distancia Forca Bruta: %.2f\n", resFB.getDistancia());
         } else {
