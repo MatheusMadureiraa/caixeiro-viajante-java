@@ -2,8 +2,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-// Renomeado de BuscaDePermutacaoThread para maior clareza. O código interno é o seu.
-class CalculadorDePermutacao {
+public class CalculadorDePermutacao {
     private List<CidadePCV> melhorRotaLocal;
     private double menorDistanciaLocal = Double.POSITIVE_INFINITY;
     private final CidadePCV cidadeOrigem;
@@ -14,7 +13,7 @@ class CalculadorDePermutacao {
         this.cidadeInicialDaPermutacao = inicialDaPermutacao;
     }
     
-    // Seu método permutar() permanece aqui, inalterado...
+    
     public void permutar(List<CidadePCV> cidades, int k) {
         if (k == cidades.size()) {
             double distanciaAtual = calcularDistanciaDaRota(cidades);
@@ -35,7 +34,6 @@ class CalculadorDePermutacao {
         }
     }
     
-    // Seu método calcularDistanciaDaRota() permanece aqui, inalterado...
     private double calcularDistanciaDaRota(List<CidadePCV> cidadesPermutadas) {
         double distancia = 0;
         CidadePCV anterior = cidadeInicialDaPermutacao;

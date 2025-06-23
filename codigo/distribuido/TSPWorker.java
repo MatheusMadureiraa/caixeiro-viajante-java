@@ -11,13 +11,11 @@ public class TSPWorker implements TSPInterface {
 
     @Override
     public ResultadoPCV resolverSubRota(CidadePCV origem, CidadePCV segundaCidade, List<CidadePCV> cidadesParaPermutar) throws RemoteException {
-        // A lógica aqui é a mesma que estava dentro da sua 'Callable' no código paralelo.
         System.out.println("WORKER: Recebida tarefa para rota iniciando com " + origem.getNome() + " -> " + segundaCidade.getNome());
         
         List<CidadePCV> restoDasCidades = new ArrayList<>(cidadesParaPermutar);
         restoDasCidades.remove(segundaCidade);
 
-        // Usa a sua classe auxiliar para fazer o cálculo pesado
         CalculadorDePermutacao calculador = new CalculadorDePermutacao(origem, segundaCidade);
         calculador.permutar(restoDasCidades, 0);
 
@@ -27,7 +25,6 @@ public class TSPWorker implements TSPInterface {
 
     public static void main(String[] args) {
         try {
-            // O IP do servidor RMI. Mude para o IP da máquina servidora se não for local.
             String host = (args.length < 1) ? "localhost" : args[0];
             
             TSPWorker worker = new TSPWorker();

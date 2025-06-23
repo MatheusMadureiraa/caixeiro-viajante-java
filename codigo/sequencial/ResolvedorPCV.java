@@ -62,17 +62,7 @@ public class ResolvedorPCV {
         return new Resultado(rota, distanciaTotal);
     }
     
-    //  Métodos de Geração e Carregamento de Dados 
-    public static List<Cidade> gerarCidadesAleatorias(int numCidades, int maxCoord) {
-        List<Cidade> cidades = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < numCidades; i++) {
-            cidades.add(new Cidade("C" + (i + 1), random.nextInt(maxCoord + 1), random.nextInt(maxCoord + 1)));
-        }
-        System.out.println(numCidades + " cidades geradas aleatoriamente.");
-        return cidades;
-    }
-
+    //Método de Geração e Carregamento de Dados
     public static List<Cidade> carregarCidadesDeArquivo(String filepath) throws IOException {
         List<Cidade> cidades = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {
@@ -90,23 +80,11 @@ public class ResolvedorPCV {
     
     //  Ponto de Entrada do Programa 
     public static void main(String[] args) {
-        List<Cidade> cidadesParaResolver = null;
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("Digite o número de cidades para gerar (ex: 15) ou 0 para carregar do arquivo 'cidades.txt': ");
-            int numCidades = scanner.nextInt();
-
-            if (numCidades > 0) {
-                cidadesParaResolver = gerarCidadesAleatorias(numCidades, 100);
-            } else {
-                try {
-                    cidadesParaResolver = carregarCidadesDeArquivo("cidades.txt");
-                } catch (IOException e) {
-                    System.err.println("Erro: Arquivo 'cidades.txt' não encontrado. Encerrando.");
-                    return;
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Entrada inválida. Encerrando.");
+        List<Cidade> cidadesParaResolver;
+        try {
+            cidadesParaResolver = carregarCidadesDeArquivo("cidades.txt");
+        } catch (IOException e) {
+            System.err.println("Erro: Arquivo 'cidades.txt' não encontrado. Encerrando.");
             return;
         }
 

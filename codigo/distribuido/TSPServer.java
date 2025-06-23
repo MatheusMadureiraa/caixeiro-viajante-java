@@ -15,16 +15,27 @@ public class TSPServer {
 
     public static void main(String[] args) {
         try {
+            //Carrega os dados das cidades a partir de um arquivo de texto.
             List<CidadePCV> cidades = carregarCidadesDeArquivo("cidades.txt");
             
             System.out.println("\n--- Executando Algoritmo de Forca Bruta Distribuido ---");
+            
+            // Medição de tempo: marca o início da execução.
             long inicio = System.nanoTime();
+            
+            // Chama o método principal que resolve o problema de forma distribuída.
             ResultadoPCV resultadoFinal = resolverDistribuido(cidades);
-            long tempoTotal = (System.nanoTime() - inicio) / 1_000_000;
+            
+            // Medição de tempo: calcula a duração total em nanossegundos.
+            long tempoTotal = (System.nanoTime() - inicio);
 
+            // Se uma rota válida foi encontrada, imprime os resultados.
             if (resultadoFinal != null && resultadoFinal.getRota() != null) {
-                System.out.printf("\nExecucao Distribuida concluida em %dms\n", tempoTotal);
+                System.out.printf("\nExecucao Distribuida concluida em %ds\n", tempoTotal / 1_000_000_000);
+                System.out.printf("Em ms: %dms\n", tempoTotal / 1_000_000);
+                
                 System.out.println("Melhor Rota Global: " + resultadoFinal.getRota().stream().map(CidadePCV::getNome).collect(Collectors.joining(" -> ")));
+                
                 System.out.printf("Distancia Total: %.2f\n", resultadoFinal.getDistancia());
             } else {
                 System.out.println("Nenhuma solucao foi encontrada.");
@@ -35,19 +46,24 @@ public class TSPServer {
         }
     }
 
+    // Método que orquestra a resolução distribuída do problema.
     public static ResultadoPCV resolverDistribuido(List<CidadePCV> cidades) {
+        // Checagem de segurança para evitar erros com listas vazias.
         if (cidades == null || cidades.size() < 2) return null;
-        if (cidades.size() > 13) {
-            System.out.println("AVISO: Forca Bruta e muito lenta para mais de 13 cidades. Execucao abortada.");
-            return new ResultadoPCV(null, Double.POSITIVE_INFINITY);
-        }
 
+        // Variável para armazenar o melhor resultado encontrado entre todos os workers.
         ResultadoPCV melhorGlobal = new ResultadoPCV(null, Double.POSITIVE_INFINITY);
+
         ExecutorService executorDoServidor = null;
 
         try {
+            // Conecta-se ao serviço de registro RMI que está rodando.
             Registry registry = LocateRegistry.getRegistry("localhost");
+            
+            // Lista para armazenar as referências (stubs) dos workers remotos.
             List<TSPInterface> workers = new ArrayList<>();
+            
+            // Procura no registro por todos os serviços com nome "TSPWorker".
             for (String name : registry.list()) {
                 if (name.startsWith("TSPWorker")) {
                     System.out.println("SERVIDOR: Encontrado worker: " + name);
@@ -55,39 +71,46 @@ public class TSPServer {
                 }
             }
 
+            // Se nenhum worker for encontrado, o programa não pode continuar.
             if (workers.isEmpty()) {
                 System.err.println("Nenhum worker RMI encontrado. Abortando.");
                 return null;
             }
             System.out.println(cidades.size() + " cidades, usando " + workers.size() + " workers...");
 
-            // Lógica de divisão do trabalho (idêntica à sua versão paralela)
+            // Define a cidade de origem (a primeira da lista) como fixa para todas as rotas.
             final CidadePCV origem = cidades.get(0);
-            final List<CidadePCV> cidadesParaPermutar = cidades.subList(1, cidades.size());
+            
+            // Cria uma CÓPIA da sublista de cidades. Isso é crucial para que seja 'Serializable'.
+            final List<CidadePCV> cidadesParaPermutar = new ArrayList<>(cidades.subList(1, cidades.size()));
 
-            // O servidor usa threads para fazer as chamadas remotas em paralelo
+            // Cria um pool de threads no servidor do tamanho do número de workers.
             executorDoServidor = Executors.newFixedThreadPool(workers.size());
             List<Future<ResultadoPCV>> futurosResultados = new ArrayList<>();
             int workerIndex = 0;
 
+            // Loop principal de distribuição: para cada "segunda cidade" possível, cria uma tarefa.
             for (final CidadePCV segundaCidade : cidadesParaPermutar) {
                 final TSPInterface worker = workers.get(workerIndex);
+                final int indexDaTarefa = workerIndex;
                 
-                // Submete uma tarefa que FAZ a chamada RMI
+                // Submete a tarefa para o pool de threads do servidor.
                 Future<ResultadoPCV> future = executorDoServidor.submit(() -> {
-                    System.out.println("SERVIDOR: Enviando tarefa para " + segundaCidade.getNome() + " para o worker " + workerIndex);
-                    // A chamada de rede acontece aqui!
+                    System.out.println("SERVIDOR: Enviando tarefa para " + segundaCidade.getNome() + " para o worker " + indexDaTarefa);
+                    // A chamada de rede (RMI). O servidor chama o método no worker.
                     return worker.resolverSubRota(origem, segundaCidade, cidadesParaPermutar);
                 });
                 futurosResultados.add(future);
                 
-                // Delega para o próximo worker (Round-Robin)
                 workerIndex = (workerIndex + 1) % workers.size();
             }
 
-            // Agrega os resultados (igual ao seu código paralelo)
+            // Loop de agregação: agora, o servidor espera a resposta de todas as tarefas.
             for (Future<ResultadoPCV> f : futurosResultados) {
+                // O método .get() bloqueia a execução até que o resultado daquela tarefa chegue.
                 ResultadoPCV resultadoParcial = f.get();
+                
+                // Compara o resultado do worker com o melhor resultado global encontrado até agora.
                 if (resultadoParcial != null && resultadoParcial.getDistancia() < melhorGlobal.getDistancia()) {
                     melhorGlobal = resultadoParcial;
                 }
@@ -97,6 +120,7 @@ public class TSPServer {
             System.err.println("Excecao no Servidor: " + e.toString());
             e.printStackTrace();
         } finally {
+            // garante que o pool de threads do servidor seja encerrado.
             if (executorDoServidor != null) {
                 executorDoServidor.shutdown();
             }
@@ -104,7 +128,7 @@ public class TSPServer {
         return melhorGlobal;
     }
     
-    // Seu método de carregar cidades, pode ser copiado para cá
+    // Método utilitário para ler as cidades de um arquivo.
     public static List<CidadePCV> carregarCidadesDeArquivo(String filepath) throws IOException {
         List<CidadePCV> cidades = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {

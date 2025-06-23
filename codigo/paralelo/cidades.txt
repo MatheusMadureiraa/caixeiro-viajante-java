@@ -9,4 +9,3 @@ Manaus,389,211
 Recife,1030,396
 Porto_Alegre,737,978
 
-
