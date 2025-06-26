@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
 
 public class ResolvedorPCV {
 
@@ -28,7 +26,7 @@ public class ResolvedorPCV {
         return new Resultado(p.getMelhorRota(), p.getMenorDistancia());
     }
 
-    //  Algoritmo do Vizinho Mais Próximo 
+    //  Algoritmo do Vizinho Mais Próximo
     public Resultado resolverVizinhoMaisProximo() {
         System.out.println("\n-- Executando Algoritmo do Vizinho Mais Próximo --");
         List<Cidade> rota = new ArrayList<>();
